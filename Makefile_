@@ -1,0 +1,25 @@
+VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+LDFLAGS := -ldflags "-s -w -X main.version=$(VERSION)"
+
+.PHONY: build clean test install cross
+
+build:
+	go build $(LDFLAGS) -o bin/tc .
+
+clean:
+	rm -rf bin/
+
+test:
+	go test ./... -v
+
+install:
+	go install $(LDFLAGS) .
+
+cross:
+	GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o bin/tc-linux-amd64 .
+	GOOS=darwin GOARCH=amd64 go build $(LDFLAGS) -o bin/tc-darwin-amd64 .
+	GOOS=darwin GOARCH=arm64 go build $(LDFLAGS) -o bin/tc-darwin-arm64 .
+	GOOS=windows GOARCH=amd64 go build $(LDFLAGS) -o bin/tc-windows-amd64.exe .
+
+lint:
+	golangci-lint run ./...
