@@ -138,6 +138,68 @@ cat file.txt | tc tail 10
 
 # 字段提取
 echo "a:b:c:d" | tc fields 2 --sep ":"
+
+### 进制转换
+
+```bash
+# 任意进制互转
+tc base 16 FF              # 16→10: 255
+tc base 10 255             # 10→16: 0xFF
+tc base 2 1010             # 2→10: 10
+tc base 8 77               # 8→10: 63
+
+# 批量转换
+tc base 16 "FF" "1A" "2B"
+
+# 显示所有进制
+tc base 16 ff --all        # 2/8/10/16/36
+```
+
+### 端口检查
+
+```bash
+# 检查端口是否被占用（Windows 下显示进程名）
+tc port 8080
+# ✗ 端口 8080 被占用 (PID: 14776, 进程: node.exe)
+
+tc port 3000
+# ✓ 端口 3000 可用
+```
+
+### 密码生成
+
+```bash
+# 16 位随机密码（默认：大小写+数字+符号）
+tc gen password
+
+# 自定义长度和字符集
+tc gen password 20                    # 20 位
+tc gen password --no-sym              # 不含符号
+tc gen password --no-upper --no-sym   # 仅小写+数字
+tc gen password 12 --digit-only       # 仅数字 12 位
+```
+
+### JWT 解码
+
+```bash
+# 解码 JWT token（不验证签名，查看 payload）
+tc jwt decode "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U"
+
+# 支持管道
+cat token.txt | tc jwt decode
+```
+
+### JSON / YAML 互转
+
+```bash
+# JSON → YAML
+cat data.json | tc convert j2y
+
+# YAML → JSON
+cat config.yaml | tc convert y2j
+
+# 保存到文件
+cat data.json | tc convert j2y > config.yaml
 ```
 
 ## 命令速查表
@@ -174,6 +236,12 @@ tc fields <n>        提取字段
 tc b64encode [data]   Base64 编码
 tc b64decode [data]   Base64 解码
 
+tc base <from> <val>  进制转换
+tc port <n>           端口检查
+tc gen password       密码生成
+tc jwt decode <token> JWT 解码
+tc convert <j2y|y2j>  JSON/YAML 互转
+
 tc version           版本信息
 ```
 
@@ -190,6 +258,8 @@ tc version           版本信息
 - Go 1.22+
 - [cobra](https://github.com/spf13/cobra) — CLI 框架
 - [gjson](https://github.com/tidwall/gjson) — JSON 查询
+- [sjson](https://github.com/tidwall/sjson) — JSON 修改
+- [yaml.v3](https://gopkg.in/yaml.v3) — YAML 解析
 - [fatih/color](https://github.com/fatih/color) — 终端颜色
 
 ## License
